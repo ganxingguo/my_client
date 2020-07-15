@@ -3,3 +3,6 @@
 *.pdb
 *.idb
 *.obj
+*.db
+*.opendb
+*.pch
