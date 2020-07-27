@@ -161,7 +161,6 @@ bool CGameRoomEx::OnSocketReadEvent(NetMessageHead * pNetHead, void * pNetData, 
 	{
 		return OnGameMessage(pNetHead, pNetData, uDataSize, pClientSocket);
 	}
-
 	}
 	//游戏信息
 	//if (m_IGameFrame != NULL)
@@ -191,6 +190,8 @@ bool CGameRoomEx::OnSocketCloseEvent()
 			FreeIGameFrame(m_IGameFrame);
 		}
 	}
+
+	ADD_LOG("socket close : ");
 	m_UserManage.DeleteGameUser(m_LogonInfo.dwUserID);
 	::PostMessage(GetParent()->m_hWnd, IDM_CLOSE_GAME_ROOM, (WPARAM)m_pRoomInfo, m_LogonInfo.dwUserID);
 
@@ -219,7 +220,11 @@ void CGameRoomEx::CloseGameRoom()
 		{
 			FreeIGameFrame(m_IGameFrame);
 		}
-	}	m_UserManage.DeleteGameUser(m_LogonInfo.dwUserID);
+	}	
+
+	ADD_LOG("closeGameRoom : ")
+
+	m_UserManage.DeleteGameUser(m_LogonInfo.dwUserID);
 	::PostMessage(GetParent()->m_hWnd, IDM_CLOSE_GAME_ROOM, (WPARAM)m_pRoomInfo, m_LogonInfo.dwUserID);
 
 	return;
@@ -290,13 +295,19 @@ bool CGameRoomEx::OnLogonMessage(NetMessageHead * pNetHead, void * pNetData, UIN
 
 		MatchToDesk();
 		m_nRunCnt = 0;
-		SetTimer(TIMER_OPT, TIMEOUT_DO_OPT, NULL);
+		//SetTimer(TIMER_OPT, TIMEOUT_DO_OPT, NULL);
+		return true;
+	}
+	case ASS_BEGIN_MATCH_ROOM:		// 匹配成功
+	{
+		//ADD_LOG("匹配成功");
 		return true;
 	}
 	case ERR_GR_NO_ENOUGH_ROOM_KEY:
 	{
 		StandingDesk();
 	}
+
 	}
 	return true;
 }
@@ -924,8 +935,8 @@ bool CGameRoomEx::OnGameMessage(NetMessageHead * pNetHead, void * pNetData, UINT
 		//ADD_LOG("滚动结果：");
 		ADD_LOG(szLog);
 
-		//sprintf_s(szLog, "剩余免费游戏次数：%d, 当前局是否免费：%d", pResult->iLeftFreeGameCnt, pResult->bFreeGame);
-		//ADD_LOG(szLog);
+		sprintf_s(szLog, "剩余免费游戏次数：%d, 当前局是否免费：%d", pResult->iLeftFreeGameCnt, pResult->bFreeGame);
+		ADD_LOG(szLog);
 
 		//ADD_LOG("图案");
 		//for (int i = 0; i < 3; ++i)
@@ -1313,6 +1324,8 @@ LRESULT CGameRoomEx::OnSetGameTime(WPARAM wparam, LPARAM lparam)
 //关闭游戏,在游戏中的机器人发强退消息，
 LRESULT CGameRoomEx::OnCloseGame(WPARAM wparam, LPARAM lparam)
 {
+	ADD_LOG("onclosegame: ");
+
 	m_bWillCloseRoom = true;
 	if (NULL != m_IGameFrame)
 	{
@@ -1377,7 +1390,7 @@ LRESULT CGameRoomEx::OnStartRoll(WPARAM wparam, LPARAM lparam)
 	}
 	else if (m_TCPSocket) {
 		ADD_LOG("开始滚动。。。。");
-		if (ROOM_ID == 188)
+		if (ROOM_ID == 188 || ROOM_ID == 189 || ROOM_ID == 190)
 		{
 			CMD_C_StartRoll tmpMsg;
 			tmpMsg.iBetMoney = 100;

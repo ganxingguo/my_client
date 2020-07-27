@@ -29,7 +29,7 @@
 #define TIMER_CHECK_RECONNET			52				//重连
 #define TIMEOUT_CHECK_RECONNECT			5 * 1000
 #define TIMER_OPT						53
-#define TIMEOUT_DO_OPT					100		//1 * 1000
+#define TIMEOUT_DO_OPT					500//1 * 1000
 
 //游戏房间类
 class CGameRoomEx : public CDialog, public IClientSocketService

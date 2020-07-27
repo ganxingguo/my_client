@@ -258,7 +258,7 @@ bool CMyClientDlg::OnSocketReadEvent(NetMessageHead * pNetHead, void * pNetData,
 	}
 	case MDM_GP_MESSAGE://房间的消息 新闻，小喇叭
 	{
-		return true;
+		return OnNoticeMessage(pNetHead, pNetData, uDataSize, pClientSocket);
 	}
 	}
 	return true;
@@ -524,6 +524,31 @@ bool CMyClientDlg::OnListMessage(NetMessageHead * pNetHead, void * pNetData, UIN
 	return TRUE;
 }
 
+bool CMyClientDlg::OnNoticeMessage(NetMessageHead* pNetHead, void * pNetData, UINT uDataSize, CTCPClientSocket * pClientSocket)
+{
+	switch (pNetHead->bAssistantID)
+	{
+	case ASS_GP_WORLD_HORN:
+	{
+		if (sizeof(MZTW_Mess_World_Horn_struct) != uDataSize)
+		{
+			ADD_LOG("ASS_GP_WORLD_HORN size Error：%d", uDataSize);
+			return false;
+		}
+
+		MZTW_Mess_World_Horn_struct* pMsg = (MZTW_Mess_World_Horn_struct*)pNetData;
+		CChineseCode code;
+
+		char szNotice[500] = { 0 };
+		code.Utf8ToGb2312(pMsg->data, szNotice, sizeof(szNotice));
+		ADD_LOG("世界喇叭：%s", szNotice);
+		return true;
+	}
+	}
+
+	return false;
+}
+
 //进入房间
 bool CMyClientDlg::EnterRoom(int roomid)
 {
@@ -575,9 +600,9 @@ bool CMyClientDlg::CreateGameRoom(RoomInfo* pRoomInfo)
 	}
 
 	ADD_LOG("游戏房间创建成功 %d", pRoomInfo->uRoomID);
-	ADD_LOG("大厅socket断开");
-	m_pTCPSocket->CloseSocket();
-	KillTimer(TIME_CHECK_SOCKET_ERROR);
+	//ADD_LOG("大厅socket断开");
+	//m_pTCPSocket->CloseSocket();
+	//KillTimer(TIME_CHECK_SOCKET_ERROR);
 
 	return true;
 }

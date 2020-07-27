@@ -70,6 +70,8 @@ public:
 	bool OnLogonMessage(NetMessageHead* pNetHead, void * pNetData, UINT uDataSize, CTCPClientSocket * pClientSocket);
 	//列表信息
 	bool OnListMessage(NetMessageHead* pNetHead, void * pNetData, UINT uDataSize, CTCPClientSocket * pClientSocket);
+	//通知推送
+	bool OnNoticeMessage(NetMessageHead* pNetHead, void * pNetData, UINT uDataSize, CTCPClientSocket * pClientSocket);
 
 protected:
 	//发送网络消息函数
