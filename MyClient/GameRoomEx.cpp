@@ -295,7 +295,7 @@ bool CGameRoomEx::OnLogonMessage(NetMessageHead * pNetHead, void * pNetData, UIN
 
 		MatchToDesk();
 		m_nRunCnt = 0;
-		//SetTimer(TIMER_OPT, TIMEOUT_DO_OPT, NULL);
+		SetTimer(TIMER_OPT, TIMEOUT_DO_OPT, NULL);
 		return true;
 	}
 	case ASS_BEGIN_MATCH_ROOM:		// 匹配成功
@@ -756,17 +756,17 @@ bool CGameRoomEx::OnRoomMessage(NetMessageHead * pNetHead, void * pNetData, UINT
 			}
 		}
 
-		StandingDesk();
+		//StandingDesk();
 
-		if (m_GameInfo.pMeUserInfo != NULL&&bDeskIndex == m_GameInfo.pMeUserInfo->GameUserInfo.bDeskNO)
-		{
-			if (rand() % 30 == 1)
-			{
-				if (m_bAutoDesk) {
-					StandingDesk();
-				}
-			}
-		}
+		//if (m_GameInfo.pMeUserInfo != NULL&&bDeskIndex == m_GameInfo.pMeUserInfo->GameUserInfo.bDeskNO)
+		//{
+		//	if (rand() % 30 == 1)
+		//	{
+		//		if (m_bAutoDesk) {
+		//			StandingDesk();
+		//		}
+		//	}
+		//}
 
 		return true;
 	}
@@ -938,24 +938,48 @@ bool CGameRoomEx::OnGameMessage(NetMessageHead * pNetHead, void * pNetData, UINT
 		sprintf_s(szLog, "剩余免费游戏次数：%d, 当前局是否免费：%d", pResult->iLeftFreeGameCnt, pResult->bFreeGame);
 		ADD_LOG(szLog);
 
-		//ADD_LOG("图案");
-		//for (int i = 0; i < 3; ++i)
-		//{
-		//	string strImage = "";
-		//	for (int j = 0; j < 5; ++j)
-		//	{
-		//		string tmpImage = GetImageName((EmImageType)pResult->iImageResult[i][j]);
-		//		strImage += tmpImage;
-		//		if (tmpImage.length() == 4) {
-		//			strImage += "--";
-		//		}
-		//		else if (tmpImage.length() == 6) {
-		//			strImage += "-";
-		//		}
-		//	}
+		int nJinluoRowCnt = 0;
+		for (int i = 0; i < 5; ++i)
+		{
+			bool bContinue = false;
+			for (int j = 0; j < 3; ++j)
+			{
+				if (pResult->iImageResult[j][i] == 10) {
+					nJinluoRowCnt++;
+					bContinue = true;
+					break;
+				}
+			}
 
-		//	ADD_LOG(strImage.c_str());
-		//}
+			if (!bContinue) {
+				break;
+			}
+		}
+
+		if (nJinluoRowCnt >= 3 && pResult->iLeftFreeGameCnt <= 0)
+		{
+			MessageBox("金锣 与 中奖数据异常");
+		}
+
+		ADD_LOG("图案");
+		for (int i = 0; i < 3; ++i)
+		{
+			string strImage = "";
+			for (int j = 0; j < 5; ++j)
+			{
+				string tmpImage = GetImageName((EmImageType)pResult->iImageResult[i][j]);
+				strImage += tmpImage;
+				if (tmpImage.length() == 4) {
+					strImage += "--";
+				}
+				else if (tmpImage.length() == 6) {
+					strImage += "-";
+				}
+			}
+
+			ADD_LOG(strImage.c_str());
+		}
+
 		//ADD_LOG("BOOL");
 		//for (int i = 0; i < 3; ++i)
 		//{
